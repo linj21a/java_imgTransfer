@@ -68,10 +68,21 @@ public class Filter_image {
                 for(int i=0;i<templist.length;i++){
                     if(templist[i].length()!=0){
                         String pic = templist[i];
+
 //[, [1642320406503](I:\学习文档\my_picture_learning\1642320406503.png),
 // [1642320406503](I:\学习文档\my_picture_learning\1642320406503.png)]
-                        String s = pic.split("\\(")[1];//I:\学习文档\my_picture_learning\1642320406503.png)
-                        String pic_path = s.substring(0,s.length()-1);
+                        String s;//I:\学习文档\my_picture_learning\1642320406503.png)
+                        String[] strings = pic.split("\\(");
+                        String pic_path;
+                        if(strings.length<2){
+//                            s = strings[0];//I:\学习文档\my_picture_learning\1642320406503.png
+                            pic_path = strings[0];
+                        }else {//包含(的分割
+//                            s = strings[1];
+                            //I:\学习文档\my_picture_learning\1642320406503.png)
+                            pic_path = strings[1].substring(0,strings[1].length()-1);
+                        }
+
                         sb.append(pic_path);
 //                        writer.write(pic_path);
                         sb.append("\n");

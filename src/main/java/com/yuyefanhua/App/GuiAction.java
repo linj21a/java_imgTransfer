@@ -24,7 +24,7 @@ public class GuiAction extends JFrame {
     JFileChooser jFileChooser = new JFileChooser();
     String regex ;
     private File f;//打开的文件
-    String initRegex = "!\\[[a-zA-Z0-9]*\\]\\(.*\\)";
+    String initRegex = "(\\(?)[a-zA-Z]*:.*.(png|jpe?g|gif|svg)(\\)?)";
     JTextField jTextField = new JTextField();
     private void setjTextFiel(){
         jTextField.setText(regex);
@@ -44,7 +44,7 @@ public class GuiAction extends JFrame {
         this.regex = regex;
         setjTextFiel();//显示正则表达式
         if(imagePath==null||imagePath.equals("")){
-            imagePathList = new String[]{""};
+            imagePathList = new String[0];
         }
 //        this.setExtendedState(JFrame.MAXIMIZED_BOTH);//全屏显示
 //        setResizable(false);//禁止用户改变窗体大小
@@ -55,7 +55,10 @@ public class GuiAction extends JFrame {
         addPanel();
         setVisible(true);
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        txaDisplay.setText(imagePathList[0]);
+//        txaDisplay.setText(imagePathList[0]);
+        txaDisplay.setText("");
+        txaDisplay.append("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张");
+
 //        addKeyListener(new KeyListener() {
 //            private int i = 0;
 //            @Override
@@ -101,6 +104,7 @@ public class GuiAction extends JFrame {
        // Dimension size=txaDisplay.getPreferredSize();    //获得文本域的首选大小
         //把定义的JTextArea放到JScrollPane里面去
         JScrollPane scroll = new JScrollPane(txaDisplay);
+
 //        scroll.setBounds(110,90,size.width,size.height);
 //        scroll.setBounds(13,10,100,100);
         //默认的设置是超过文本框才会显示滚动条，以下设置让滚动条一直显示
@@ -137,7 +141,8 @@ public class GuiAction extends JFrame {
                     finally {
                         length = imagePathList.length;
                         i = 0;
-                        txaDisplay.setText(imagePathList[0]);
+                        txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                        txaDisplay.append(imagePathList[i]);
                         createLableImage(jLabel);//刷新图片显示
                     }
                 }else{
@@ -159,7 +164,9 @@ public class GuiAction extends JFrame {
                 if(i<0){
                     i=0;
                 }
-                txaDisplay.setText(imagePathList[i]);
+                //可以尝试抽取代码
+                txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                txaDisplay.append(imagePathList[i]);
                 createLableImage(jLabel);//给jlabel添加图片
             }
         });
@@ -169,9 +176,10 @@ public class GuiAction extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 i++;
                 if(i>=length){
-                    i = Math.max((length - 1), 0);
+                    i = length-1;
                 }
-                txaDisplay.setText(imagePathList[i]);
+                txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                txaDisplay.append(imagePathList[i]);
                 createLableImage(jLabel);//给jlabel添加图片
             }
         });
@@ -179,21 +187,16 @@ public class GuiAction extends JFrame {
         button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (i < length) {
-                    try {
-                        BufferedImage bufferedImage = Filter_image.readImage(imagePathList[i]);
+                try {
+                    BufferedImage bufferedImage = Filter_image.readImage(imagePathList[i]);
 //                        i++;
-                        Filter_image.setClipboardImage(bufferedImage);
-                    } catch (IOException ex) {
-                        JOptionPane.showMessageDialog(GuiAction.this, "异常，从头开始！", "警告", JOptionPane.ERROR_MESSAGE);
-                        i = 0;
-                    }finally {
-                        txaDisplay.setText(imagePathList[i]);
-                    }
-                }else {
-                    i=0;
-                    JOptionPane.showMessageDialog(GuiAction.this, "没有图片了！将从头开始", "警告", JOptionPane.ERROR_MESSAGE);
-                    txaDisplay.setText(imagePathList[i]);
+                    Filter_image.setClipboardImage(bufferedImage);
+                } catch (IOException ex) {
+                    JOptionPane.showMessageDialog(GuiAction.this, "异常，从头开始！", "警告", JOptionPane.ERROR_MESSAGE);
+                    i = 0;
+                }finally {
+                    txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                    txaDisplay.append(imagePathList[i]);
                 }
             }
         });
@@ -201,19 +204,10 @@ public class GuiAction extends JFrame {
         button2.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                if (i < length) {
-//                    System.out.println("ctrl+c:复制字符");
-                    if(f==null||imagePathList==null||imagePathList.length==0){
-                        return;
-                    }
-                    Filter_image.setClipboardString(imagePathList[i]);
-//                    System.out.println(Filter_image.getClipboardString());
-//                    i++;
-                }else {
-                    i=0;
-                    JOptionPane.showMessageDialog(GuiAction.this, "没有图片了！将从头开始", "警告", JOptionPane.ERROR_MESSAGE);
+                if (f == null || imagePathList == null || imagePathList.length == 0) {
+                    return;
                 }
-                txaDisplay.setText(imagePathList[i]);
+                Filter_image.setClipboardString(imagePathList[i]);
             }
         });
         Button button_openfile = new Button("选择文件");
@@ -239,7 +233,8 @@ public class GuiAction extends JFrame {
                 finally {
                     length = imagePathList.length;
                     i = 0;
-                    txaDisplay.setText(imagePathList[0]);
+                    txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                    txaDisplay.append(imagePathList[i]);
                     jTextField.setText(regex);
                     createLableImage(jLabel);//刷新图片显示
                 }
@@ -270,8 +265,40 @@ public class GuiAction extends JFrame {
 
             }
         });
+        Button zeor = new Button("选择第几张");
+        zeor.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(f==null){
+                    JOptionPane.showMessageDialog(null,
+                            "请先打开文件！","错误！",JOptionPane.ERROR_MESSAGE);
+                    return;
+                }
+                String input = JOptionPane.showInputDialog(null,
+                        "输入图片的索引(从0开始，小于"+length,"修改要复制的图片",JOptionPane.QUESTION_MESSAGE);
+                if(input==null||input.equals("")){
+                    return;
+                }
+                try{
+                    int index = Integer.parseInt(input);
+                    if(index<1||index>length){
+                        JOptionPane.showMessageDialog(null,
+                                "输入不是合法范围","错误！",JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+                    i = index-1;
+                    txaDisplay.setText("\t图片数量:"+imagePathList.length+"\t当前是第"+(i+1)+"张\n");
+                    txaDisplay.append(imagePathList[i]);
+                    createLableImage(jLabel);//刷新图片显示
+                }catch (Exception exception){
+                    JOptionPane.showMessageDialog(null,
+                            "输入不是整数","错误！",JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
         jpanel2.add(button_up);
         jpanel2.add(button_on);
+        jpanel2.add(zeor);
         jpanel2.add(button1);
         jpanel2.add(button2);
         jpanel2.add(button_openfile);
@@ -279,6 +306,9 @@ public class GuiAction extends JFrame {
 
         //------------显示图片的jpanel
         JPanel pictureJpanel = new JPanel(new BorderLayout());
+        int width = Math.max(pictureJpanel.getWidth()-10,10);
+                int height =  Math.max(pictureJpanel.getHeight()-10,10);
+        jLabel.setSize(width,height);
         pictureJpanel.add(jLabel);
         contentPane.add(pictureJpanel,BorderLayout.CENTER);
         contentPane.add(jpanel2,BorderLayout.SOUTH);
@@ -302,33 +332,23 @@ public class GuiAction extends JFrame {
         int height = imageIcon.getIconHeight();
         int jw = jLabel.getWidth();
         int jh = jLabel.getHeight();
-        int[]deal = new int[2];
-        if(height<=0||jh<=0){
+//        System.out.println(jw+" jlabel  "+jh);
+//        System.out.println(width+" picture   "+height);
+        if(height<=0){
             return new int[]{100,100};
         }
-        if(width>jw ||height>jh){
-            if(width/height>= jw/jh){
-                if(width>jw){
-                    deal[0]=jw;
-                    deal[1]=(height*jw)/width;
-                }else{
-                    deal[0]=width;
-                    deal[1]=height;
-                }
-            }else{
-                if(height>jh){
-                    deal[1]=jh;
-                    deal[0]=(width*jh)/height;
-                }else{
-                    deal[0]=width;
-                    deal[1]=height;
-                }
-            }
-        }else{
-            deal[0] = width;
-            deal[1] = height;
+        if(width<=jw && height<=jh){//无需缩放
+            return new int[]{width,height};
         }
-        return deal;
+        //必须缩放 同时保证缩放得到的width和height都小于label的width和height
+        double c1 = jw*1.0/width;
+        double c2 = jh*1.0/height;
+//        System.out.println(c1+"倍数"+c2);
+        //必然有一个是正数
+        double max = Math.min(c1,c2);
+        width = (int)(width*max);
+        height = (int)(height*max);
+        return new int[]{width,height};
     }
 //    获取等比例图片：
 
