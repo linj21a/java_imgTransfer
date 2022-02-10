@@ -5,5 +5,5 @@
 
 现在更新，使用了Inno Setup Compiler编译了自带的jdk进入，此时无需jdk即可安装使用。
 
-链接：链接：https://pan.baidu.com/s/1MrwUTMQO0BgMvTgpXAVvhQ 
-提取码：rbbc
+链接：https://pan.baidu.com/s/1Hw5w1XAmSX6nDkbApoYtXw 
+提取码：k154
